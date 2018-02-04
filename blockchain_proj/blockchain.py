@@ -90,8 +90,8 @@ class Blocky():
 
         for nod in near_nodes:
 
-            response = request.args.get('http://{nodef}/chain'.format(nodef=nod))
-            print response
+            response = request.url('http://{nodef}/chain'.format(nodef=nod))
+            print "an the answer is: {resp}".format(resp=response)
             if response.status_code == 200:
                 length = response.json()['length']
                 chain = response.json()['chain']

@@ -7,7 +7,7 @@ thatBC= Blocky()
 app = Flask(__name__)
 with app.app_context():
     # within this block, current_app points to app.
-    print current_app.name
+    print app.name
 # Generate a globally unique address for this node
 node_identifier = str(uuid4()).replace('-', '')
 
@@ -61,7 +61,8 @@ def register_nodes():
     values = request.get_json()
 
     nodes = values.get('nodes')
-    print nodes
+    print "nodes are {nodex}".format(nodex=nodes)
+
     if nodes is None:
         return "Error: Please supply a valid list of nodes", 400
 
@@ -79,7 +80,6 @@ def register_nodes():
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
     replaced = thatBC.resolv()
-
     if replaced:
         response = {
             'message': 'Our chain was replaced',
