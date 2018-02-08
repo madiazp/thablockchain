@@ -1,14 +1,12 @@
 from blockchain import *
 from uuid import uuid4
 from flask import Flask, jsonify, request, current_app
+
 thatBC= Blocky()
 
 # Instantiate our Node
 app = Flask(__name__)
-with app.app_context():
-    # within this block, current_app points to app.
-    print app.name
-# Generate a globally unique address for this node
+
 node_identifier = str(uuid4()).replace('-', '')
 
 @app.route('/mine', methods=['GET'])
@@ -61,7 +59,6 @@ def register_nodes():
     values = request.get_json()
 
     nodes = values.get('nodes')
-    print "nodes are {nodex}".format(nodex=nodes)
 
     if nodes is None:
         return "Error: Please supply a valid list of nodes", 400
@@ -79,20 +76,22 @@ def register_nodes():
 
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
+
     replaced = thatBC.resolv()
     if replaced:
+        print("entre csm!!")
         response = {
             'message': 'Our chain was replaced',
             'new_chain': thatBC.chain
-        }
+            }
     else:
         response = {
-
             'message': 'Our chain is authoritative',
             'chain': thatBC.chain
-        }
-
-    return jsonify(response), 200
+            }
+    with app.app_context():
+        return jsonify(response), 200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+
+    app.run(host='0.0.0.0', port=5001, threaded=True)
