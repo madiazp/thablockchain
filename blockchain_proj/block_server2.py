@@ -1,3 +1,7 @@
+#block_server es un servidor de plastico que expone en web a la blockchain
+#para que se pueda interactuar con ella
+
+
 from blockchain import *
 from uuid import uuid4
 from flask import Flask, jsonify, request, current_app

@@ -1,17 +1,17 @@
+#Este archivo define la clase de la blockchain
 import hashlib, json, sys
-from flask import Flask, jsonify, request
 from urllib.parse import urlparse
 from time import time
 import requests, os
-app = Flask(__name__)
 
+#definimos la clase
 class Blocky():
-
+#inicializamos la clase
     def __init__(self):
-        self.chain = []
-        self.current = []
-        self.nodes = set()
-        if len(self.chain) == 0:
+        self.chain = [] # aca deben estar todos los bloques
+        self.current = [] #aca deben estar todas las transacciones por bloque
+        self.nodes = set() #aca los nodos que minaran la blockchain, los peers
+        if len(self.chain) == 0: # si no existe un bloque generamos uno, el bloque genesis
             self.prev_hash=0
             self.prev_nonce=0
             self.current.append({
@@ -22,41 +22,46 @@ class Blocky():
             self.next_block()
 
 
-
+    #el metodo que creara un nuevo bloque
     def next_block(self):
-        ind=len(self.chain)+1
-        next_preblock = self.preblockify(ind,time(),self.current, self.prev_hash,self.prev_nonce)
-        block_hash,nonce= self.hashing(next_preblock)
-        block=next_preblock
+        ind=len(self.chain)+1 #avanzamos al siguiente indice, la id del bloque
+        block = self.preblockify(ind,time(),self.current, self.prev_hash,self.prev_nonce) #creamos un prebloque con informacion que excluye al confirmacion del bloque
+        block_hash,nonce= self.hashing(block) #minamos el prebloque generando el hash del bloque y el nonce(la prueba de trabajo)
+
         block.update(
         {"hash": block_hash,
         "nonce": nonce
-        })
-        self.prev_hash = block_hash
-        self.prev_nonce = nonce
-        self.chain.append(block)
-        self.current = []
+        }) #agregamos el hash y el nonce al prebloque, generando un bloque entero minado (y confirmado al menos una vez)
+        self.prev_hash = block_hash #definimos el hash previo para el siguiente bloque
+        self.prev_nonce = nonce #definimos la prueba de trabajo para el siguiente bloque
+        self.chain.append(block) #agregamos el bloque a la cadena de bloques
+        self.current = [] #reiniciamos las transacciones, las transacciones son unicas en cada bloque
         return block
 
+    #metodo que agrega transacciones a un bloque , el payload del bloque
     def transaction(self, tx_addr, rx_addr, amount):
         self.current.append({
             "sender": tx_addr,
             "recipient": rx_addr,
             "amount": amount
         })
+    #metodo que agrega nodos que minaran nuestra blockchain
     def node_registry(self, addr):
-        parsed_url = urlparse(addr)
-        self.nodes.add(parsed_url.netloc)
+        parsed_url = urlparse(addr) #obtenemos la direccion de nuestro minero
+        self.nodes.add(parsed_url.netloc) #agregamos la direccion de nuestro minero
 
-
+    # metodo que valida la blockchain entera
     def validation_b(self, chain):
-        l_block = chain[0]
-        current_index=1
+        #inicializamos en el primer bloque
+        l_block = chain[0] #last block
+        current_index=1  #la id del bloque actual (siguiente a l_block)
+        #recorremos toda nuestra cadena de bloque
         while current_index < len(chain):
             blk= chain[current_index]
             print(l_block)
             print(blk)
             print("\n ----------------- \n")
+            #recreamos el bloque previo
             ind=l_block["index"]
             tim=l_block["time"]
             txx=l_block["tx"]
@@ -64,22 +69,20 @@ class Blocky():
             pno=l_block["prev_nonce"]
 
             pl_block = self.preblockify(ind,tim,txx,ph,pno)
-            print(pl_block)
             l_hash, l_nonce = self.hashing(pl_block)
-            print("\n--------------\n")
-            print(l_hash)
-            print(l_nonce)
-            print(blk["prev_hash"])
-            print(blk["prev_nonce"])
+            # si el hash previo recalculado coincide con el hash previo en el nuevo bloque entonces puede ser valido
             if blk['prev_hash'] != l_hash:
                 return False
+            #si el nonce previo recalculado coincide con el nonce previo en el nuevo bloque entonces verificamos el bloque
             if blk['prev_nonce'] != l_nonce:
                 return False
-
+            #pasamos al siguiente bloque previo
             l_block = blk
+            #pasamos al siguiente bloque
             current_index += 1
+        #si todo esta ok la cadena de bloque es valida
         return True
-
+    #metodo de consenso, todos los mineros deben minar el mayor bloque de la red
     def resolv(self):
         near_nodes = self.nodes
         new_chain = None
