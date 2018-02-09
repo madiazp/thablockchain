@@ -10,7 +10,7 @@ thatBC= Blocky()
 
 # Instantiate our Node
 app = Flask(__name__)
-
+app.config['JSON_SORT_KEYS'] = True
 node_identifier = str(uuid4()).replace('-', '')
 
 @app.route('/mine', methods=['GET'])
@@ -76,14 +76,21 @@ def register_nodes():
         'total_nodes': list(thatBC.nodes),
     }
     return jsonify(response), 201
+@app.route('/nodes/getnodes',methods=['GET'])
+def get_nodes():
 
+    response = {
+        'message': 'the members are:',
+        'all_nodes': list(thatBC.nodes)
+        }
+    return jsonify(response),200
 
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
 
     replaced = thatBC.resolv()
     if replaced:
-        print("entre csm!!")
+
         response = {
             'message': 'Our chain was replaced',
             'new_chain': thatBC.chain
@@ -93,8 +100,8 @@ def consensus():
             'message': 'Our chain is authoritative',
             'chain': thatBC.chain
             }
-    with app.app_context():
-        return jsonify(response), 200
+
+    return jsonify(response), 200
 
 if __name__ == '__main__':
 

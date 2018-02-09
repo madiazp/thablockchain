@@ -37,7 +37,7 @@ class Blocky():
         self.chain.append(block) #agregamos el bloque a la cadena de bloques
         self.current = [] #reiniciamos las transacciones, las transacciones son unicas en cada bloque
         return block
-
+    def transaction(input, output, ):
     #metodo que agrega transacciones a un bloque , el payload del bloque
     def transaction(self, tx_addr, rx_addr, amount):
         self.current.append({
@@ -96,7 +96,7 @@ class Blocky():
 
                 os.environ['NO_PROXY'] = 'localhost'
                 response = requests.get(urls)
-                #response = request.form.get()
+
 
 
             if response.status_code == 200:
