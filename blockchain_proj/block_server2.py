@@ -3,10 +3,15 @@
 
 
 from blockchain import *
+from transactions import *
 from uuid import uuid4
 from flask import Flask, jsonify, request, current_app
+import sys
+
+
 
 thatBC= Blocky()
+
 
 # Instantiate our Node
 app = Flask(__name__)
@@ -19,7 +24,8 @@ def mine():
 
     # We must receive a reward for finding the proof.
     # The sender is "0" to signify that this node has mined a new coin.
-    thatBC.transaction("1",node_identifier,1)
+    out_form = [1,node_identifier,"test script"]
+    thatBC.transaction([],out_form,True)
 
     # Forge the new Block by adding it to the chain
     thatBC.prev_hash = thatBC.chain[-1]["hash"]
@@ -36,18 +42,25 @@ def mine():
 
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
-
+    out_f,in_f = [],[]
     values = request.get_json()
-
+    val_in = values["input_form"]
+    val_out = values["output_form"]
+    for vi in val_in :
+        d=val_in[vi]
+        in_f.append([d["tx"],d["value"],d["n"],d["addr"],d["script"]])
+    for vo in val_out :
+        d=val_out[vo]
+        out_f.append([d["tx"],d["value"],d["n"],d["addr"],d["script"]])
+    index = thatBC.transaction(in_f,out_f,False)
     # Check that the required fields are in the POST'ed data
-    required = ['sender', 'recipient', 'amount']
-    if not all(k in values for k in required):
-        return 'Missing values', 400
+    #required = ['sender', 'recipient', 'amount']
+    #if not all(k in values for k in required):
+#        return 'Missing values', 400
 
     # Create a new Transaction
-    index = thatBC.transaction(values['sender'], values['recipient'], values['amount'])
-
-    response = {'message': 'Transaction will be added to Block {index}'}
+#    index = thatBC.transaction(values['sender'], values['recipient'], values['amount'])
+    response = {'message': 'Transaction will be added to Block {ind}'.format(ind=index)}
     return jsonify(response), 201
 
 @app.route('/chain', methods=['GET'])
@@ -104,5 +117,4 @@ def consensus():
     return jsonify(response), 200
 
 if __name__ == '__main__':
-
-    app.run(host='0.0.0.0', port=5001, threaded=True)
+    app.run(host='0.0.0.0', port=5001, threaded=True, debug=True)

@@ -1,0 +1,27 @@
+{
+"input_form":{
+  "0":{
+    "tx": 25125166152,
+    "value": 800,
+    "n": 0,
+    "addr": "mi casa",
+    "script": "2891289"
+    },
+  "1":{
+    "tx": 1111116152,
+    "value": 500,
+    "n": 0,
+    "addr": "mi depa",
+    "script": "d213sv9"
+    }
+  },
+"output_form":{
+  "0":{
+    "tx": 0,
+    "value": 1200,
+    "n": 0,
+    "addr": "mi casa",
+    "script": "2891289"
+    }
+  }
+}

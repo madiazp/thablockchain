@@ -3,14 +3,16 @@ import hashlib, json, sys
 from urllib.parse import urlparse
 from time import time
 import requests, os
-
+from transactions import *
 #definimos la clase
 class Blocky():
 #inicializamos la clase
+
     def __init__(self):
         self.chain = [] # aca deben estar todos los bloques
         self.current = [] #aca deben estar todas las transacciones por bloque
         self.nodes = set() #aca los nodos que minaran la blockchain, los peers
+        self.transy = Transy(self.chain)
         if len(self.chain) == 0: # si no existe un bloque generamos uno, el bloque genesis
             self.prev_hash=0
             self.prev_nonce=0
@@ -35,16 +37,19 @@ class Blocky():
         self.prev_hash = block_hash #definimos el hash previo para el siguiente bloque
         self.prev_nonce = nonce #definimos la prueba de trabajo para el siguiente bloque
         self.chain.append(block) #agregamos el bloque a la cadena de bloques
+        self.transy.db = self.chain
         self.current = [] #reiniciamos las transacciones, las transacciones son unicas en cada bloque
         return block
-    def transaction(input, output, ):
+
     #metodo que agrega transacciones a un bloque , el payload del bloque
-    def transaction(self, tx_addr, rx_addr, amount):
-        self.current.append({
-            "sender": tx_addr,
-            "recipient": rx_addr,
-            "amount": amount
-        })
+    def transaction(self, input_form, output_form, fee):
+        if fee:
+            TX = self.transy.make_fee(output_form)
+        else:
+            TX = self.transy.make_entry(input_form, output_form)
+
+        self.current.append(TX)
+        return TX
     #metodo que agrega nodos que minaran nuestra blockchain
     def node_registry(self, addr):
         parsed_url = urlparse(addr) #obtenemos la direccion de nuestro minero

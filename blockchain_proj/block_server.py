@@ -41,9 +41,11 @@ def new_transaction():
         return 'Missing values', 400
 
     # Create a new Transaction
-    index = thatBC.transaction(values['sender'], values['recipient'], values['amount'])
-
-    response = {'message': 'Transaction will be added to Block {index}'}
+    status,index = thatBC.transaction(values['sender'], values['recipient'], values['amount'])
+    if status:
+        response = {'message': 'errror adding transaction'}
+    else:
+        response = {'message': 'Transaction will be added to Block {index}'}
     return jsonify(response), 201
 
 @app.route('/chain', methods=['GET'])
