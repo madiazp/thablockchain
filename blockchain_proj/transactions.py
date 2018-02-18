@@ -26,7 +26,7 @@ class Transy():
     def make_entry(self, input_form, output_form):
 
         if self.invalid_entry(input_form,output_form):
-            return False, {}
+            return False
         entry= {
             "input_list":{
             },
@@ -68,7 +68,7 @@ class Transy():
                     }
             }})
         self.tx_hist.append(entry)
-        return True,entry
+        return entry
 
 
     def invalid_entry(self,input_form,output_form):
@@ -82,6 +82,10 @@ class Transy():
                 print("No teni tantas moneas po compadre")
                 return True
             self.fee = in_count - out_count
+            if self.search_double_spent(input_form):
+                print(" estai tratando de gastar dos veces la plata, no sea barsa")
+                return True
+
             for itx in input_form:
 
                 if self.search_spent(itx[0],itx[2]):
@@ -90,29 +94,39 @@ class Transy():
 
             return False
 
+    def search_double_spent(self, input_form):
+        i = 0
+        j = 0
+        for k in input_form:
+            for h in input_form:
+                if k[0] == h[0] and k[2] == k[2]:
+                    i +=0
+        if i-len(input_form) > 0:
+            return True
+
+        for tx in input_form:
+            for hist in self.tx_hist:
+                for tx_h in hist["input_list"]:
+                    if tx[0] == hist["input_list"][tx_h]["tx"] and tx[2] == hist["input_list"][tx_h]["n"]:
+                        print("something fishy")
+                        return True
+
+
     def search_spent(self, idtx,ntx):
         k=0
 
         for chn in self.db:
-
             try:
-                print("si hay utxo")
-                print(idtx)
                 for i in self.db[k]["tx"]:
+
                     utx = i["UTXO"]
                     for keys in utx:
-                        print(utx[keys]["tx_id"])
                         if utx[keys]["tx_id"] == idtx and utx[keys]["n"] == ntx and utx[keys]["spent"]:
                             return True
-
             except:
-                print("no hay UTXO")
-
+                pass
             k +=1
 
-                #if ent["tx_id"] == idtx and ent["n"] == ntx and ent["spent"]:
-                    #return True
-            print("\n")
         return False
 
     @staticmethod

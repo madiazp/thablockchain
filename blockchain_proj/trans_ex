@@ -13,7 +13,15 @@
     "n": 0,
     "addr": "mi depa",
     "script": "d213sv9"
+    },
+ "2":{
+    "tx": 25125166152,
+    "value": 800,
+    "n": 0,
+    "addr": "mi casa",
+    "script": "2891289"
     }
+
   },
 "output_form":{
   "0":{
