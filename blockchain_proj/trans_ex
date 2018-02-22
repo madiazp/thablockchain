@@ -13,13 +13,6 @@
     "n": 0,
     "addr": "mi depa",
     "script": "d213sv9"
-    },
- "2":{
-    "tx": 25125166152,
-    "value": 800,
-    "n": 0,
-    "addr": "mi casa",
-    "script": "2891289"
     }
 
   },
@@ -28,7 +21,7 @@
     "tx": 0,
     "value": 1200,
     "n": 0,
-    "addr": "mi casa",
+    "addr": "4646506700a150eddce154619d5ef0d7b8d1b5b43f41c3f227948e95091bd243f8d47d0e4c5815d1a52d94b4f7801dd541800e8c3697dbffba04da700f1ee3bc",
     "script": "2891289"
     }
   }

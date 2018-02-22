@@ -33,7 +33,9 @@ class Transy():
             "in_count":len(input_form),
             "output_list":{
             },
-            "out_count":len(output_form)
+            "out_count":len(output_form),
+            "UTXO":{
+            }
         }
         k=0
         l=0
@@ -56,17 +58,18 @@ class Transy():
         for x in entry["output_list"]:
 
             entry["output_list"][x]["tx"] = entry["hash"]
-        j=1
+        j=0
         for utxi in input_form:
-            j += 1
-            entry.update({"UTXO":{
+
+            entry['UTXO'].update({
                 str(j):{
                     "addr":utxi[3],
                     "tx_id": utxi[0],
                     "n": utxi[2],
                     "spent": True
                     }
-            }})
+            })
+            j += 1
         self.tx_hist.append(entry)
         return entry
 
@@ -99,17 +102,19 @@ class Transy():
         j = 0
         for k in input_form:
             for h in input_form:
-                if k[0] == h[0] and k[2] == k[2]:
-                    i +=0
+                if k[0] == h[0] and k[2] == h[2]:
+                    i += 1
         if i-len(input_form) > 0:
             return True
-
-        for tx in input_form:
-            for hist in self.tx_hist:
-                for tx_h in hist["input_list"]:
-                    if tx[0] == hist["input_list"][tx_h]["tx"] and tx[2] == hist["input_list"][tx_h]["n"]:
-                        print("something fishy")
-                        return True
+        try:
+            for tx in input_form:
+                for hist in self.tx_hist:
+                    for tx_h in hist["input_list"]:
+                        if tx[0] == hist["input_list"][tx_h]["tx"] and tx[2] == hist["input_list"][tx_h]["n"]:
+                            print("something fishy")
+                            return True
+        except:
+            print("coinbase transaction")
 
 
     def search_spent(self, idtx,ntx):
