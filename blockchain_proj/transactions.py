@@ -1,5 +1,6 @@
 import rsa, hashlib, sys
 import json
+import binascii
 
 class Transy():
 
@@ -96,11 +97,36 @@ class Transy():
                 if self.search_spent(itx[0],itx[2]):
                     print("{txi} ya fue gastado".format(txi=itx[0]))
                     return True
-                #if self.invalid_inputs(itx[0]):
-                #    print("no posei esas moneas")
-                #    return True
+                if self.invalid_inputs(itx[0], itx[2],itx[4], itx[3]):
+                    print("no posei esas moneas")
+                    return True
 
             return False
+    def invalid_inputs(self, itx, ntx, scr, dest):
+        k=0
+        pub = rsa.PublicKey(scr['pub_n'],scr['pub_e'])
+        sign = binascii.unhexlify(scr['sign'].split("'")[1].encode())
+        epub = str(pub.n).encode('utf-8')
+        paddr = hashlib.sha512(epub).hexdigest()
+        for chn in self.db:
+            try:
+                for i in self.db[k]["tx"]:
+
+                    ilist = i["output_list"]
+                    for keys in ilist:
+                        if ilist[keys]["tx_id"] == idtx and ilist[keys]["n"] == ntx:
+                             if ilist[keys]["addr"] == paddr and rsa.verify(dest,sign,pub) :
+                                 return False
+                             else
+                                return True
+
+
+
+
+            except:
+                pass
+            k +=1
+        return True
 
     def search_double_spent(self, input_form):
         i = 0

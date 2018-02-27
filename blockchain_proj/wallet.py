@@ -2,6 +2,8 @@ import rsa
 import hashlib
 from base64 import b64encode, b64decode
 import requests, os, json, urllib
+
+import binascii
 #pubkey, privkey = rsa.newkeys(512)
 
 class Wallet():
@@ -60,7 +62,7 @@ class Wallet():
         money = sorted(money, key=lambda m: m[1])
         cand = []
         valid = dest.encode('utf-8')
-        sign = b64encode(rsa.sign(valid, self.priv,"SHA-256"))
+        sign =str(binascii.hexlify(rsa.sign(valid, self.priv,"SHA-256")))
         scr_i = {'pub_n': self.pub.n,'pub_e': self.pub.e, 'sign': sign}
         funds,h = 0,0
         input_form={}
@@ -86,6 +88,7 @@ class Wallet():
         #req = urllib.request.Request("{serv}/transactions/new".format(serv=self.server))
         head ={'Content-Type': 'application/json'}
         #return trans_form.encode('utf-8')
+        print(trans_form)
         response = requests.post(self.server + "/transactions/new",headers = head, json =trans_form)
         return response
 
