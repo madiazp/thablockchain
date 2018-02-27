@@ -85,6 +85,8 @@ class Transy():
                 print("No teni tantas moneas po compadre")
                 return True
             self.fee = in_count - out_count
+
+
             if self.search_double_spent(input_form):
                 print(" estai tratando de gastar dos veces la plata, no sea barsa")
                 return True
@@ -94,6 +96,9 @@ class Transy():
                 if self.search_spent(itx[0],itx[2]):
                     print("{txi} ya fue gastado".format(txi=itx[0]))
                     return True
+                #if self.invalid_inputs(itx[0]):
+                #    print("no posei esas moneas")
+                #    return True
 
             return False
 
@@ -133,6 +138,9 @@ class Transy():
             k +=1
 
         return False
+
+
+
 
     @staticmethod
     def hashify(the_data):
